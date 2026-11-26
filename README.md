@@ -1,25 +1,25 @@
 # 📚 Extractor y Jerarquizador de Apuntes para NotebookLM
 
-Herramienta en Python para extraer, limpiar y jerarquizar notas de estudio a partir de archivos **PDF exportados desde Google Docs**. Filtra todo el texto de relleno y genera un archivo Markdown limpio (`output/<nombre>_resumen.md`) listo para subir como fuente a [NotebookLM](https://notebooklm.google.com).
+Herramienta en Python para extraer, limpiar y jerarquizar notas de estudio a partir de archivos **PDF exportados desde Google Docs**. Filtra todo el texto de relleno y genera un archivo Markdown limpio (`output/<nombre>_resumen.md`) listo para subir como fuente única a [NotebookLM](https://notebooklm.google.com).
 
 ---
 
-## 🎨 Código de Colores y Jerarquía de Estudio
+## 🎨 Sistema de 4 Colores de Resaltado
 
-Para mantener la toma de apuntes simple y ágil, el sistema utiliza **2 colores principales + subrayado**:
+La jerarquía visual se basa **100% en los 4 colores de resaltado** definidos (sin depender de negritas ni subrayados):
 
-| Formato Visual en Google Docs | Nivel en Markdown | Significado / Uso |
-| :--- | :--- | :--- |
-| **Resaltado Naranja + Negrita** | `### 🔴 [CONCEPTO MUY IMPORTANTE]` | Concepto principal / Definición clave |
-| **Resaltado Naranja (sin negrita)** | `- 🟠 [Concepto / Explicación]:` | Explicación o contenido complementario del concepto |
-| **Resaltado Morado / Violeta** | `  - 🟣 [Concepto relacionado]:` | Conceptos o ramas asociadas al tema |
-| **Texto Subrayado (*underline*)** | `  - ✏️ [Detalle]:` | Precisiones, datos de examen o detalles puntuales |
+| Color en Google Docs | Código HEX | Nivel en Markdown | Función y Significado |
+| :--- | :--- | :--- | :--- |
+| **Morado Oscuro / Púrpura** | `#8E7CC3` | `## 🟣 [TÍTULO]` | **Títulos de sección** y ejes temáticos principales |
+| **Naranja** | `#FF9900` | `### 🟠 [CONCEPTO IMPORTANTE]` | **Conceptos clave** y definiciones indispensables |
+| **Lavanda / Morado Claro** | `#B4A7D6` | `- 🟪 [Información relacionada]:` | **Información asociada**, explicaciones y ramas directas |
+| **Amarillo Claro / Manteca** | `#FFF2CC` | `  - 🟡 [Información complementaria]:` | **Detalles secundarios**, ejemplos, aclaraciones y precisiones |
 
-> **Nota:** Cualquier texto que no tenga resaltado ni subrayado es descartado automáticamente.
+> ℹ️ **Filtro automático:** Cualquier texto que no tenga uno de estos 4 colores de resaltado es descartado por completo.
 
 ---
 
-## 📁 Estructura del Proyecto
+## 📁 Estructura del Repositorio
 
 ```text
 ExtractorApuntes/
@@ -27,7 +27,7 @@ ExtractorApuntes/
 │   └── .gitkeep
 ├── output/                <- Aquí se guardan los archivos Markdown filtrados
 │   └── .gitkeep
-├── extraer_apuntes.py     <- Script principal de extracción y jerarquización
+├── extraer_apuntes.py     <- Script principal de extracción
 ├── requirements.txt       <- Dependencias (PyMuPDF)
 ├── .gitignore
 └── README.md
@@ -35,63 +35,53 @@ ExtractorApuntes/
 
 ---
 
-## 🚀 Instalación Rápida
+## 🚀 Instalación y Uso Rápido
 
-1. Clona el repositorio o abre la carpeta en tu editor / terminal.
-2. Instala las dependencias:
+1. Instala las dependencias necesarias:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-```bash
-pip install -r requirements.txt
-```
+2. **Uso Automático:**
+   Coloca tu archivo PDF en la carpeta `input/` y ejecuta:
+   ```bash
+   python extraer_apuntes.py
+   ```
+   *El script procesará el PDF de `input/` y generará el resultado en `output/<nombre_archivo>_resumen.md`.*
 
----
+3. **Modo Calibración:**
+   Si deseas inspeccionar los colores detectados en un PDF antes de procesar:
+   ```bash
+   python extraer_apuntes.py "input/mi_clase.pdf" --calibrate
+   ```
 
-## 💻 Modo de Uso
-
-### 1. Uso Automático (Recomendado)
-Coloca tu archivo PDF en la carpeta `input/` y ejecuta:
-
-```bash
-python extraer_apuntes.py
-```
-*El script detectará automáticamente el PDF dentro de `input/` y creará el resumen en la carpeta `output/`.*
-
-### 2. Procesar un archivo específico
-```bash
-python extraer_apuntes.py input/mi_clase.pdf
-```
-
-### 3. Filtrar por rango de páginas
-```bash
-python extraer_apuntes.py input/apuntes.pdf --start-page 1 --end-page 20
-```
-
-### 4. Modo Calibración (inspeccionar colores detectados)
-```bash
-python extraer_apuntes.py input/apuntes.pdf --calibrate
-```
+4. **Procesar un rango de páginas:**
+   ```bash
+   python extraer_apuntes.py "input/mi_clase.pdf" --start-page 1 --end-page 30
+   ```
 
 ---
 
-## 🤖 Prompt para NotebookLM
+## 🤖 Prompt Optimizado para NotebookLM
 
-Una vez generado tu archivo en `output/`, súbelo como fuente a NotebookLM y utiliza el siguiente prompt:
+Una vez generado el archivo en la carpeta `output/`, súbelo como **fuente única** a tu cuaderno en [NotebookLM](https://notebooklm.google.com) y pega este prompt:
 
 ```markdown
-He subido mis apuntes de estudio filtrados y jerarquizados visualmente. Utiliza ÚNICAMENTE la información de esta fuente para generar:
+He subido mis apuntes de estudio organizados estrictamente bajo un sistema jerárquico de 4 colores. Utiliza ÚNICAMENTE la información de esta fuente (sin inventar ni asumir conceptos externos) para generar:
 
-1. MAPA CONCEPTUAL Y ESTRUCTURA:
-   - Nodos principales: Únicamente los "🔴 [CONCEPTO MUY IMPORTANTE]".
-   - Ramas asociadas: Los "🟣 [Concepto relacionado]".
-   - Explicaciones y desarrollo: Los "🟠 [Concepto / Explicación]".
-   - Precisiones técnicas: Los "✏️ [Detalle]".
+1. MAPA CONCEPTUAL Y ESTRUCTURA TEMÁTICA:
+   - Utiliza como ejes principales los "## 🟣 [TÍTULO]".
+   - Anida debajo como nodos centrales los "### 🟠 [CONCEPTO IMPORTANTE]".
+   - Vincula a ellos la "- 🟪 [Información relacionada]".
+   - Incluye como sub-ramas los datos de "🟡 [Información complementaria]".
 
 2. GUÍA DE ESTUDIO INTENSIVA:
-   - Sintetiza cada tema priorizando los conceptos clave (🔴 y 🟣).
-   - Destaca los detalles subrayados (✏️) como puntos críticos para exámenes.
+   - Sintetiza cada sección priorizando al máximo los Títulos (🟣) y Conceptos Importantes (🟠).
+   - Desarrolla cada concepto con su información relacionada (🟪).
+   - Resume la información complementaria (🟡) como puntos de contexto y ejemplos para recordar.
 
-3. QUIZ DE AUTOEVALUACIÓN (10 preguntas con respuestas justificadas al final):
-   - 6 preguntas sobre conceptos muy importantes (🔴).
-   - 3 preguntas sobre conceptos relacionados (🟣).
-   - 1 pregunta sobre detalles técnicos subrayados (✏️).
+3. QUIZ DE AUTOEVALUACIÓN (10 preguntas de opción múltiple con respuestas justificadas al final):
+   - 6 preguntas enfocadas en la comprensión y aplicación de los Conceptos Importantes (🟠).
+   - 3 preguntas sobre la Información relacionada (🟪) y su vínculo con los conceptos principales.
+   - 1 pregunta sobre detalles o ejemplos de la Información complementaria (🟡).
 ```
